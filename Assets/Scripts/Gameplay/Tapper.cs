@@ -1,0 +1,100 @@
+// ============================================================
+//  Tapper.cs — Woodland Burrow
+//  Attach su un UI Button. Ogni tap aggiunge ghiande
+//  in base a GameConstants.AcornsPerTap, moltiplicato
+//  dai bonus attivi (Cuccia Morbida, ecc).
+// ============================================================
+
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+namespace WoodlandBurrow
+{
+    public class Tapper : MonoBehaviour
+    {
+        [Header("UI")]
+        [SerializeField] private Button tapButton;
+        [SerializeField] private TextMeshProUGUI floatingTextPrefab;  // "+6 🌰" animato
+        [SerializeField] private RectTransform floatingTextParent;
+
+        [Header("Feel")]
+        [SerializeField] private float punchScale  = 1.15f;
+        [SerializeField] private float punchDuration = 0.08f;
+
+        // Moltiplicatori aggiuntivi (applicati dagli upgrade)
+        private double _tapMultiplier = 1.0;
+
+        private Vector3 _baseScale;
+
+        // --------------------------------------------------------
+
+        private void Awake()
+        {
+            _baseScale = tapButton.transform.localScale;
+            tapButton.onClick.AddListener(OnTap);
+        }
+
+        // --------------------------------------------------------
+
+        public void OnTap()
+        {
+            double earned = GameConstants.AcornsPerTap * _tapMultiplier;
+            ResourceManager.Instance.AddAcorns(earned);
+
+            SpawnFloatingText(earned);
+            StartCoroutine(PunchAnimation());
+
+            // Qui si possono aggiungere: particle burst, haptic feedback, SFX
+        }
+
+        // --------------------------------------------------------
+        //  Floating text "+6 🌰"
+        // --------------------------------------------------------
+
+        private void SpawnFloatingText(double amount)
+        {
+            if (floatingTextPrefab == null || floatingTextParent == null) return;
+
+            var text = Instantiate(floatingTextPrefab, floatingTextParent);
+            text.text = $"+{FormatNumber(amount)} 🌰";
+
+            // Posizione casuale attorno al centro
+            var rt = text.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(Random.Range(-40f, 40f), Random.Range(0f, 30f));
+
+            Destroy(text.gameObject, 1.2f);
+            // Aggiungi qui un'animazione LeanTween o DOTween per il float-up
+        }
+
+        // --------------------------------------------------------
+        //  Punch scale (senza librerie esterne)
+        // --------------------------------------------------------
+
+        private System.Collections.IEnumerator PunchAnimation()
+        {
+            tapButton.transform.localScale = _baseScale * punchScale;
+            yield return new WaitForSeconds(punchDuration);
+            tapButton.transform.localScale = _baseScale;
+        }
+
+        // --------------------------------------------------------
+        //  API pubblica per upgrade
+        // --------------------------------------------------------
+
+        /// <summary>Applica un moltiplicatore al tap (es. ×2 dalla Cuccia Morbida)</summary>
+        public void ApplyTapMultiplier(double multiplier)
+        {
+            _tapMultiplier *= multiplier;
+        }
+
+        // --------------------------------------------------------
+
+        private static string FormatNumber(double n)
+        {
+            if (n >= 1_000_000) return $"{n / 1_000_000:0.#}M";
+            if (n >= 1_000)     return $"{n / 1_000:0.#}k";
+            return $"{n:0}";
+        }
+    }
+}
