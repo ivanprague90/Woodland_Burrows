@@ -56,7 +56,7 @@ namespace WoodlandBurrow.UI
             var data  = producer.GetData();
             int level = producer.GetLevel();
             bool active = level > 0;
-            bool locked = false; // TODO: collega a ZoneManager per stanze bloccate
+            bool locked = ZoneManager.Instance != null && !ZoneManager.Instance.IsUnlocked(data.zoneIndex);
 
             if (iconImage != null && data.icon != null)
                 iconImage.sprite = data.icon;

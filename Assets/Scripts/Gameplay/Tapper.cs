@@ -8,6 +8,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using WoodlandBurrow.UI;
 
 namespace WoodlandBurrow
 {
@@ -15,7 +16,7 @@ namespace WoodlandBurrow
     {
         [Header("UI")]
         [SerializeField] private Button tapButton;
-        [SerializeField] private TextMeshProUGUI floatingTextPrefab;  // "+6 🌰" animato
+        [SerializeField] private FloatingText floatingTextPrefab;
         [SerializeField] private RectTransform floatingTextParent;
 
         [Header("Feel")]
@@ -56,15 +57,9 @@ namespace WoodlandBurrow
         {
             if (floatingTextPrefab == null || floatingTextParent == null) return;
 
-            var text = Instantiate(floatingTextPrefab, floatingTextParent);
-            text.text = $"+{FormatNumber(amount)} 🌰";
-
-            // Posizione casuale attorno al centro
-            var rt = text.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(Random.Range(-40f, 40f), Random.Range(0f, 30f));
-
-            Destroy(text.gameObject, 1.2f);
-            // Aggiungi qui un'animazione LeanTween o DOTween per il float-up
+            var ft = Instantiate(floatingTextPrefab, floatingTextParent);
+            var startPos = new Vector2(Random.Range(-40f, 40f), Random.Range(0f, 30f));
+            ft.Play($"+{FormatNumber(amount)} 🌰", startPos);
         }
 
         // --------------------------------------------------------

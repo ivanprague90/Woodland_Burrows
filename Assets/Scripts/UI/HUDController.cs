@@ -24,7 +24,14 @@ namespace WoodlandBurrow.UI
         [SerializeField] private GameObject      offlineBadge;
         [SerializeField] private TextMeshProUGUI offlineBadgeText;
 
+        public static HUDController Instance { get; private set; }
+
         // --------------------------------------------------------
+
+        private void Awake()
+        {
+            Instance = this;
+        }
 
         private void OnEnable()
         {

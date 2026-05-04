@@ -117,6 +117,7 @@ namespace WoodlandBurrow
         //  Serializzazione (usata da SaveManager)
         // --------------------------------------------------------
 
+        public ProducerData GetData() => data;
         public int  GetLevel()   => _level;
         public void SetLevel(int level)
         {

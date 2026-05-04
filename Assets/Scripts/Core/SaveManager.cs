@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using WoodlandBurrow.UI;
 
 namespace WoodlandBurrow
 {
@@ -111,7 +112,7 @@ namespace WoodlandBurrow
             string time   = FormatDuration(seconds);
             string earned = FormatNumber(amount);
             Debug.Log($"[SaveManager] Offline earnings: +{earned} 🌰 in {time}");
-            // TODO: mostra popup UI "Bentornato! Spike ha raccolto +X 🌰 mentre eri via"
+            HUDController.Instance?.ShowOfflineBadge(amount);
         }
 
         // --------------------------------------------------------
