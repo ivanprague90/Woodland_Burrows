@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Woodland Burrow — Guida Phase 2 Unity Editor</title>
+<style>
+  :root {
+    --bg:       #1a1a2e;
+    --surface:  #16213e;
+    --card:     #0f3460;
+    --accent:   #e94560;
+    --gold:     #f5a623;
+    --green:    #4caf50;
+    --blue:     #2196f3;
+    --purple:   #9c27b0;
+    --text:     #e0e0e0;
+    --muted:    #9e9e9e;
+    --code-bg:  #0d1117;
+    --border:   rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 60%, #16213e 100%);
+    border-bottom: 2px solid var(--gold);
+    padding: 40px 48px 32px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 { font-size: 2rem; color: var(--gold); letter-spacing: -0.5px; }
+  header p  { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+  header .badge {
+    display: inline-block; background: var(--accent);
+    color: #fff; font-size: 0.75rem; font-weight: 700;
+    padding: 2px 10px; border-radius: 20px; margin-left: 12px;
+    vertical-align: middle; letter-spacing: 0.5px;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper { display: flex; min-height: 100vh; }
+  nav {
+    width: 260px; flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky; top: 97px; height: calc(100vh - 97px);
+    overflow-y: auto;
+  }
+  nav .nav-title {
+    font-size: 0.7rem; font-weight: 700; color: var(--muted);
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 0 20px 12px;
+  }
+  nav a {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--muted);
+    font-size: 0.88rem; padding: 8px 20px;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  nav a:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  nav a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(245,166,35,0.06); }
+  nav .nav-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--card); display: flex; align-items: center;
+    justify-content: center; font-size: 0.72rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  main {
+    flex: 1; padding: 40px 48px;
+    max-width: 960px;
+  }
+
+  /* ── SECTIONS ── */
+  section { margin-bottom: 56px; scroll-margin-top: 120px; }
+  section h2 {
+    font-size: 1.45rem; color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  section h2 .sec-num {
+    background: var(--gold); color: var(--bg);
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 800; flex-shrink: 0;
+  }
+  h3 { font-size: 1.05rem; color: #fff; margin: 24px 0 10px; }
+
+  /* ── STEPS ── */
+  .steps { list-style: none; }
+  .steps li {
+    display: flex; gap: 16px; margin-bottom: 14px;
+  }
+  .steps li .step-n {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--card); border: 2px solid var(--blue);
+    color: var(--blue); display: flex; align-items: center;
+    justify-content: center; font-size: 0.8rem; font-weight: 700;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .steps li .step-body { flex: 1; }
+  .steps li .step-body strong { color: #fff; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-left: 4px solid;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px; margin: 16px 0;
+    font-size: 0.9rem;
+  }
+  .callout.warn  { border-color: #ff9800; background: rgba(255,152,0,0.08); }
+  .callout.tip   { border-color: var(--green); background: rgba(76,175,80,0.08); }
+  .callout.info  { border-color: var(--blue); background: rgba(33,150,243,0.08); }
+  .callout.danger{ border-color: var(--accent); background: rgba(233,69,96,0.08); }
+  .callout strong { display: block; margin-bottom: 4px; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; }
+  .callout.warn  strong { color: #ff9800; }
+  .callout.tip   strong { color: var(--green); }
+  .callout.info  strong { color: var(--blue); }
+  .callout.danger strong{ color: var(--accent); }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  th {
+    background: var(--card); color: var(--gold);
+    font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 10px 14px; text-align: left;
+  }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td code, th code { background: transparent; color: var(--gold); }
+
+  /* ── CODE ── */
+  code {
+    background: var(--code-bg); color: #79c0ff;
+    padding: 2px 7px; border-radius: 4px;
+    font-size: 0.87em; font-family: 'Cascadia Code', 'Fira Code', monospace;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 18px 20px; overflow-x: auto;
+    font-size: 0.87rem; margin: 12px 0;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    color: #e6edf3;
+  }
+  pre .comment { color: #8b949e; }
+  pre .key     { color: #ff7b72; }
+  pre .val     { color: #79c0ff; }
+  pre .str     { color: #a5d6ff; }
+
+  /* ── PATH PILL ── */
+  .path {
+    display: inline-flex; align-items: center; gap: 0;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden; font-size: 0.83rem;
+    margin: 4px 0;
+  }
+  .path span {
+    padding: 3px 10px;
+    border-right: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .path span:last-child { border-right: none; color: var(--gold); }
+  .path span:first-child { color: #fff; }
+  .path .arrow { color: var(--muted); padding: 3px 6px; }
+
+  /* ── INSPECTOR BLOCK ── */
+  .inspector {
+    background: #2d2d2d; border: 1px solid #555;
+    border-radius: 8px; padding: 0; overflow: hidden;
+    margin: 14px 0; font-size: 0.87rem;
+  }
+  .inspector-header {
+    background: #3c3c3c; padding: 8px 14px;
+    font-weight: 700; color: #ccc; font-size: 0.82rem;
+    letter-spacing: 0.4px; display: flex; align-items: center; gap: 8px;
+  }
+  .inspector-header .comp-icon { font-size: 1rem; }
+  .insp-row {
+    display: flex; align-items: baseline;
+    padding: 5px 14px; border-bottom: 1px solid #3c3c3c;
+  }
+  .insp-row:last-child { border-bottom: none; }
+  .insp-label { width: 200px; flex-shrink: 0; color: #bbb; font-size: 0.83rem; }
+  .insp-value { color: #79c0ff; font-size: 0.83rem; }
+  .insp-value.assign { color: var(--gold); }
+  .insp-value.bool-t { color: var(--green); }
+  .insp-value.bool-f { color: var(--accent); }
+  .insp-section {
+    background: #353535; padding: 4px 14px;
+    color: #888; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.8px; text-transform: uppercase;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 7px 0; display: flex; gap: 10px; align-items: flex-start;
+    border-bottom: 1px solid var(--border); font-size: 0.9rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "☐"; font-size: 1rem; color: var(--muted); flex-shrink: 0;
+  }
+
+  /* ── HIERARCHY TREE ── */
+  .tree {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 20px; font-family: monospace;
+    font-size: 0.85rem; line-height: 1.9;
+  }
+  .tree .folder { color: var(--gold); }
+  .tree .go     { color: #79c0ff; }
+  .tree .comp   { color: var(--green); font-size: 0.78rem; }
+  .tree .new    { color: var(--accent); font-weight: 700; }
+  .tree .indent1 { padding-left: 20px; }
+  .tree .indent2 { padding-left: 40px; }
+  .tree .indent3 { padding-left: 60px; }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-block; padding: 1px 8px; border-radius: 12px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .tag.new     { background: rgba(233,69,96,0.2);  color: var(--accent); border: 1px solid var(--accent); }
+  .tag.mod     { background: rgba(33,150,243,0.2); color: var(--blue);   border: 1px solid var(--blue); }
+  .tag.opt     { background: rgba(156,39,176,0.2); color: #ce93d8;       border: 1px solid #ce93d8; }
+  .tag.done    { background: rgba(76,175,80,0.2);  color: var(--green);  border: 1px solid var(--green); }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 24px; margin-bottom: 10px; }
+  li { margin-bottom: 6px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { background: var(--surface); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .progress-title { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar { background: #1a1a2e; border-radius: 4px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--gold), var(--accent)); }
+  .progress-steps { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .progress-step {
+    font-size: 0.78rem; padding: 3px 10px; border-radius: 12px;
+    background: var(--card); color: var(--muted);
+  }
+  .progress-step.done { background: rgba(76,175,80,0.15); color: var(--green); }
+  .progress-step.active { background: rgba(245,166,35,0.15); color: var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🦔 Woodland Burrow <span class="badge">PHASE 2</span></h1>
+  <p>Guida completa all'implementazione in Unity Editor — Juice, Audio, Particelle &amp; Prestige</p>
+</header>
+
+<div class="wrapper">
+
+<!-- ════ NAV ════ -->
+<nav>
+  <div class="nav-title">Indice</div>
+  <a href="#overview"   ><span class="nav-num">0</span> Overview &amp; Gerarchia</a>
+  <a href="#prestige"   ><span class="nav-num">1</span> PrestigeManager</a>
+  <a href="#audio"      ><span class="nav-num">2</span> AudioManager</a>
+  <a href="#shake"      ><span class="nav-num">3</span> ScreenShake</a>
+  <a href="#particles"  ><span class="nav-num">4</span> Tap Particles</a>
+  <a href="#hud"        ><span class="nav-num">5</span> HUD — Prestige Button</a>
+  <a href="#offline"    ><span class="nav-num">6</span> Badge Offline</a>
+  <a href="#execorder"  ><span class="nav-num">7</span> Script Execution Order</a>
+  <a href="#checklist"  ><span class="nav-num">8</span> Checklist Finale</a>
+  <a href="#testing"    ><span class="nav-num">9</span> Testing &amp; Debug</a>
+</nav>
+
+<!-- ════ MAIN ════ -->
+<main>
+
+<!-- ── 0. OVERVIEW ── -->
+<section id="overview">
+  <h2><span class="sec-num">0</span> Overview &amp; Gerarchia della Scena</h2>
+
+  <div class="progress-wrap">
+    <div class="progress-title">Progresso Phase 2 — script scritti ✔, setup Unity rimanente</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:35%"></div></div>
+    <div class="progress-steps">
+      <span class="progress-step done">Script C# ✔</span>
+      <span class="progress-step done">ScriptableObjects ✔</span>
+      <span class="progress-step active">Inspector setup ← sei qui</span>
+      <span class="progress-step">Audio Clip</span>
+      <span class="progress-step">Particle Config</span>
+      <span class="progress-step">Test su device</span>
+    </div>
+  </div>
+
+  <p>Questa sezione mostra la <strong>gerarchia target</strong> della scena dopo aver completato tutto il setup di Phase 2. Usala come riferimento visivo mentre lavori.</p>
+
+  <div class="tree">
+    <div class="folder">📁 Hierarchy — SampleScene</div>
+    <div class="indent1 go">📦 GameManager <span class="comp">← tutti i singleton</span></div>
+    <div class="indent2 comp">▸ ResourceManager</div>
+    <div class="indent2 comp">▸ SaveManager</div>
+    <div class="indent2 comp">▸ ZoneManager</div>
+    <div class="indent2 comp">▸ GameBootstrap</div>
+    <div class="indent2 comp new">▸ PrestigeManager  ← NUOVO</div>
+    <div class="indent2 comp new">▸ AudioManager     ← NUOVO</div>
+    <div class="indent2 comp new">▸ ScreenShake      ← NUOVO</div>
+    <div class="indent1 go">📦 GameManager/MusicSource <span class="new">← NUOVO figlio</span></div>
+    <div class="indent2 comp new">▸ AudioSource (loop, ambient)</div>
+    <div class="indent1 go">📦 GameManager/SFXSource <span class="new">← NUOVO figlio</span></div>
+    <div class="indent2 comp new">▸ AudioSource (one-shot, SFX)</div>
+    <div class="indent1 go">📷 Main Camera</div>
+    <div class="indent1 go">🎨 Canvas</div>
+    <div class="indent2 go">▸ TopBar / HUD...</div>
+    <div class="indent2 go">▸ OfflineBadge</div>
+    <div class="indent2 go new">▸ PrestigeButton  ← NUOVO (inattivo)</div>
+    <div class="indent2 go">▸ TapButton</div>
+    <div class="indent2 go">▸ ProducerCards</div>
+    <div class="indent1 go new">✨ TapParticles <span class="new">← NUOVO (world space)</span></div>
+  </div>
+
+  <div class="callout info">
+    <strong>Nota</strong>
+    I componenti nuovi sono 3 aggiunte al <code>GameManager</code> + 2 GameObject figli per gli AudioSource + 1 ParticleSystem in world space + 1 pulsante nel Canvas. Tutto il resto già esiste da Phase 1.
+  </div>
+</section>
+
+<!-- ── 1. PRESTIGE MANAGER ── -->
+<section id="prestige">
+  <h2><span class="sec-num">1</span> PrestigeManager <span class="tag new">NUOVO</span></h2>
+
+  <p>Il PrestigeManager è il più semplice da configurare: non ha field Inspector da assegnare, si limita a leggere e scrivere PlayerPrefs autonomamente.</p>
+
+  <h3>Aggiungere il componente</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Nel pannello <strong>Hierarchy</strong>, clicca sul GameObject <code>GameManager</code> (o quello che ospita gli altri singleton come ResourceManager, SaveManager ecc.).
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Nel pannello <strong>Inspector</strong>, clicca il pulsante <strong>Add Component</strong> in fondo.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">3</span>
+      <div class="step-body">
+        Cerca <code>PrestigeManager</code> → selezionalo. Il componente apparirà con zero field pubblici visibili: è corretto.
+      </div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">⭐</span> Prestige Manager (Script)</div>
+    <div class="insp-row">
+      <div class="insp-label">Script</div>
+      <div class="insp-value assign">PrestigeManager</div>
+    </div>
+    <div class="insp-row" style="color:#8b949e; font-size:0.8rem; padding: 8px 14px;">
+      Nessun field da configurare — tutto gestito via PlayerPrefs.
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <strong>Come funziona</strong>
+    Al primo avvio <code>PrestigeCount = 0</code> e <code>PrestigeMultiplier = 1.0</code> (nessun bonus). Dopo ogni prestige il contatore sale e il moltiplicatore diventa 1.5<sup>n</sup>. Questi dati sopravvivono al reset del gioco perché usano una chiave PlayerPrefs separata (<code>WB_PrestigeCount</code>) che NON viene cancellata da <code>DoPrestige()</code>.
+  </div>
+</section>
+
+<!-- ── 2. AUDIO MANAGER ── -->
+<section id="audio">
+  <h2><span class="sec-num">2</span> AudioManager <span class="tag new">NUOVO</span></h2>
+
+  <p>L'AudioManager richiede due AudioSource separati (uno per la musica in loop, uno per gli SFX one-shot). Li creeremo come figli del <code>GameManager</code>.</p>
+
+  <h3>Step 1 — Creare i due AudioSource figli</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Nella Hierarchy, tasto destro su <code>GameManager</code> → <strong>Create Empty</strong>. Rinominalo <code>MusicSource</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Seleziona <code>MusicSource</code> → Inspector → <strong>Add Component</strong> → cerca <code>Audio Source</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">3</span>
+      <div class="step-body">Configura il componente AudioSource di <code>MusicSource</code> come indicato nella tabella:</div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">🔊</span> Audio Source — MusicSource</div>
+    <div class="insp-row"><div class="insp-label">AudioClip</div><div class="insp-value assign">None (assegnerai dopo)</div></div>
+    <div class="insp-row"><div class="insp-label">Output</div><div class="insp-value">None (Audio Listener)</div></div>
+    <div class="insp-row"><div class="insp-label">Mute</div><div class="insp-value bool-f">False</div></div>
+    <div class="insp-row"><div class="insp-label">Bypass Effects</div><div class="insp-value bool-f">False</div></div>
+    <div class="insp-row"><div class="insp-label">Play On Awake</div><div class="insp-value bool-f">False ← importante!</div></div>
+    <div class="insp-row"><div class="insp-label">Loop</div><div class="insp-value bool-t">True ← importante!</div></div>
+    <div class="insp-row"><div class="insp-label">Priority</div><div class="insp-value">128</div></div>
+    <div class="insp-row"><div class="insp-label">Volume</div><div class="insp-value">0.4</div></div>
+    <div class="insp-row"><div class="insp-label">Pitch</div><div class="insp-value">1</div></div>
+    <div class="insp-row"><div class="insp-label">Spatial Blend</div><div class="insp-value">0 (2D)</div></div>
+  </div>
+
+  <ol class="steps" start="4">
+    <li>
+      <span class="step-n">4</span>
+      <div class="step-body">
+        Tasto destro su <code>GameManager</code> → <strong>Create Empty</strong>. Rinominalo <code>SFXSource</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">5</span>
+      <div class="step-body">
+        Seleziona <code>SFXSource</code> → <strong>Add Component</strong> → <code>Audio Source</code>.
+      </div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">🔉</span> Audio Source — SFXSource</div>
+    <div class="insp-row"><div class="insp-label">AudioClip</div><div class="insp-value">None</div></div>
+    <div class="insp-row"><div class="insp-label">Play On Awake</div><div class="insp-value bool-f">False</div></div>
+    <div class="insp-row"><div class="insp-label">Loop</div><div class="insp-value bool-f">False</div></div>
+    <div class="insp-row"><div class="insp-label">Volume</div><div class="insp-value">1.0</div></div>
+    <div class="insp-row"><div class="insp-label">Spatial Blend</div><div class="insp-value">0 (2D)</div></div>
+  </div>
+
+  <h3>Step 2 — Aggiungere AudioManager a GameManager</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Seleziona <code>GameManager</code> → <strong>Add Component</strong> → <code>AudioManager</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Nel componente AudioManager, assegna i field <strong>Music Source</strong> e <strong>SFX Source</strong> trascinando i rispettivi figli dalla Hierarchy.
+      </div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">🎵</span> Audio Manager (Script)</div>
+    <div class="insp-section">Musica Ambientale</div>
+    <div class="insp-row"><div class="insp-label">Music Source</div><div class="insp-value assign">⟵ trascina MusicSource</div></div>
+    <div class="insp-row"><div class="insp-label">Ambient Music</div><div class="insp-value">None (assegna quando hai il file)</div></div>
+    <div class="insp-row"><div class="insp-label">Music Volume</div><div class="insp-value">0.4</div></div>
+    <div class="insp-section">SFX</div>
+    <div class="insp-row"><div class="insp-label">Sfx Source</div><div class="insp-value assign">⟵ trascina SFXSource</div></div>
+    <div class="insp-row"><div class="insp-label">Tap Clip</div><div class="insp-value">None (assegna quando hai il file)</div></div>
+    <div class="insp-row"><div class="insp-label">Upgrade Clip</div><div class="insp-value">None</div></div>
+    <div class="insp-row"><div class="insp-label">Zone Unlock Clip</div><div class="insp-value">None</div></div>
+    <div class="insp-row"><div class="insp-label">Offline Badge Clip</div><div class="insp-value">None</div></div>
+    <div class="insp-row"><div class="insp-label">Prestige Clip</div><div class="insp-value">None</div></div>
+    <div class="insp-row"><div class="insp-label">Sfx Volume</div><div class="insp-value">0.8</div></div>
+  </div>
+
+  <div class="callout tip">
+    <strong>Audio Clip — dove trovare file gratuiti</strong>
+    Siti consigliati: <strong>freesound.org</strong> (licenza CC), <strong>kenney.nl</strong> (package completi gratis). Cerca "acorn", "pop", "chime", "ambient forest". Formati accettati da Unity: .wav, .mp3, .ogg.
+  </div>
+
+  <div class="callout warn">
+    <strong>Attenzione — Audio Listener</strong>
+    Assicurati che nella scena ci sia UN SOLO <code>Audio Listener</code>, tipicamente sulla <code>Main Camera</code>. Se Unity mostra il warning "There are 2 audio listeners in the scene" rimuovi quello extra.
+  </div>
+</section>
+
+<!-- ── 3. SCREEN SHAKE ── -->
+<section id="shake">
+  <h2><span class="sec-num">3</span> ScreenShake <span class="tag new">NUOVO</span></h2>
+
+  <p>Il componente ScreenShake muove leggermente la camera per dare impatto agli eventi importanti. Aggiungiamolo direttamente al <code>GameManager</code>.</p>
+
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Seleziona <code>GameManager</code> → <strong>Add Component</strong> → cerca <code>ScreenShake</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Il field <strong>Target Camera</strong> può restare vuoto: lo script trova <code>Camera.main</code> automaticamente in <code>Start()</code>. Se vuoi essere esplicito, trascina la <code>Main Camera</code> dalla Hierarchy.
+      </div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">📷</span> Screen Shake (Script)</div>
+    <div class="insp-row">
+      <div class="insp-label">Target Camera</div>
+      <div class="insp-value assign">None — oppure trascina Main Camera</div>
+    </div>
+  </div>
+
+  <h3>Intensità degli shake — riepilogo</h3>
+  <table>
+    <tr><th>Evento</th><th>Intensità</th><th>Magnitudine</th><th>Durata</th></tr>
+    <tr><td>Upgrade (livelli > 1)</td><td><code>Small</code></td><td>0.06</td><td>0.15 s</td></tr>
+    <tr><td>Primo acquisto stanza</td><td><code>Medium</code></td><td>0.12</td><td>0.28 s</td></tr>
+    <tr><td>Zona sbloccata</td><td><code>Big</code></td><td>0.20</td><td>0.45 s</td></tr>
+  </table>
+
+  <div class="callout info">
+    <strong>Nota</strong>
+    Lo script memorizza la posizione originale della camera in <code>Start()</code>. Se usi una camera che si muove (es. follow camera), dovrai aggiornare <code>_camOriginalPos</code> continuamente. Per questo progetto la camera è fissa, quindi va benissimo così.
+  </div>
+</section>
+
+<!-- ── 4. PARTICLES ── -->
+<section id="particles">
+  <h2><span class="sec-num">4</span> Tap Particles <span class="tag new">NUOVO</span></h2>
+
+  <p>Le particelle al tap simulano ghiande/foglie che volano via quando il giocatore tocca il bottone. Usiamo un Particle System in World Space, visibile sopra la UI.</p>
+
+  <h3>Step 1 — Creare il GameObject delle particelle</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Nella Hierarchy, tasto destro sullo spazio vuoto (NON dentro il Canvas) → <strong>Effects → Particle System</strong>. Rinominalo <code>TapParticles</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Nella <strong>Transform</strong>, imposta Position: <code>X 0 / Y -2 / Z 0</code> (circa al centro-basso della scena, vicino al tap button).
+      </div>
+    </li>
+  </ol>
+
+  <h3>Step 2 — Configurare il Particle System</h3>
+  <p>Seleziona <code>TapParticles</code> e configura ogni modulo come segue:</p>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">✨</span> Particle System — Modulo principale (sempre visibile)</div>
+    <div class="insp-row"><div class="insp-label">Duration</div><div class="insp-value">0.30</div></div>
+    <div class="insp-row"><div class="insp-label">Looping</div><div class="insp-value bool-f">False ← disattiva!</div></div>
+    <div class="insp-row"><div class="insp-label">Start Delay</div><div class="insp-value">0</div></div>
+    <div class="insp-row"><div class="insp-label">Start Lifetime</div><div class="insp-value">0.5 — 0.8 (Random Between Two Constants)</div></div>
+    <div class="insp-row"><div class="insp-label">Start Speed</div><div class="insp-value">3 — 7 (Random Between Two Constants)</div></div>
+    <div class="insp-row"><div class="insp-label">Start Size</div><div class="insp-value">0.12 — 0.22 (Random Between Two Constants)</div></div>
+    <div class="insp-row"><div class="insp-label">Start Color</div><div class="insp-value">Random Color → imposta due colori: #D4A017 e #8B4513 (marrone ghianda)</div></div>
+    <div class="insp-row"><div class="insp-label">Gravity Modifier</div><div class="insp-value">0.4 (caduta lieve)</div></div>
+    <div class="insp-row"><div class="insp-label">Simulation Space</div><div class="insp-value">World</div></div>
+    <div class="insp-row"><div class="insp-label">Play On Awake</div><div class="insp-value bool-f">False ← importante!</div></div>
+    <div class="insp-row"><div class="insp-label">Stop Action</div><div class="insp-value">None</div></div>
+    <div class="insp-row"><div class="insp-label">Max Particles</div><div class="insp-value">30</div></div>
+  </div>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">💥</span> Modulo: Emission</div>
+    <div class="insp-row"><div class="insp-label">Rate over Time</div><div class="insp-value">0 (zero!)</div></div>
+    <div class="insp-row"><div class="insp-label">Bursts</div><div class="insp-value assign">+ Add Burst → Time: 0 / Count: 15 / Cycles: 1</div></div>
+  </div>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">🔵</span> Modulo: Shape</div>
+    <div class="insp-row"><div class="insp-label">Shape</div><div class="insp-value">Circle</div></div>
+    <div class="insp-row"><div class="insp-label">Radius</div><div class="insp-value">0.5</div></div>
+    <div class="insp-row"><div class="insp-label">Arc</div><div class="insp-value">360</div></div>
+  </div>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">📉</span> Modulo: Size over Lifetime — attivalo con la spunta</div>
+    <div class="insp-row"><div class="insp-label">Size</div><div class="insp-value">Curva: inizia a 1, scende a 0 alla fine (fade out dimensione)</div></div>
+  </div>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">🎨</span> Modulo: Renderer</div>
+    <div class="insp-row"><div class="insp-label">Render Mode</div><div class="insp-value">Billboard</div></div>
+    <div class="insp-row"><div class="insp-label">Material</div><div class="insp-value assign">Default-Particle (già presente in Unity)</div></div>
+    <div class="insp-row"><div class="insp-label">Order in Layer</div><div class="insp-value">10 (sopra gli sprite di gioco)</div></div>
+    <div class="insp-row"><div class="insp-label">Sorting Layer</div><div class="insp-value">Default — oppure crea un layer "UI_Particles" se vuoi più controllo</div></div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Visibilità sopra la Canvas</strong>
+    Se le particelle appaiono <em>sotto</em> la UI, aumenta <strong>Order in Layer</strong> fino a quando non sono visibili sopra tutto. Con Canvas in Screen Space - Overlay, le particelle in World Space potrebbero non apparire sopra. In quel caso:
+    <br><br>
+    <strong>Soluzione alternativa:</strong> Crea un secondo Canvas separato con <code>Render Mode = Screen Space - Camera</code>, mettici dentro un secondo Canvas vuoto con Sort Order alto (es. 50), e posiziona lì il ParticleSystem.
+    <br><br>
+    Per ora testa con il World Space standard — nella maggior parte dei setup 2D URP funziona.
+  </div>
+
+  <h3>Step 3 — Collegare TapParticles al Tapper</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Nella Hierarchy, seleziona il GameObject che ha il componente <code>Tapper</code> (solitamente il TapButton o un GameObject dedicato).
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Nel componente <strong>Tapper</strong>, cerca il field <strong>Tap Particles</strong> (sezione "Particelle").
+      </div>
+    </li>
+    <li>
+      <span class="step-n">3</span>
+      <div class="step-body">
+        Trascina <code>TapParticles</code> dalla Hierarchy dentro il field <strong>Tap Particles</strong>.
+      </div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">👆</span> Tapper (Script) — aggiornamento Phase 2</div>
+    <div class="insp-section">UI</div>
+    <div class="insp-row"><div class="insp-label">Tap Button</div><div class="insp-value assign">⟵ già assegnato da Phase 1</div></div>
+    <div class="insp-row"><div class="insp-label">Floating Text Prefab</div><div class="insp-value assign">⟵ già assegnato da Phase 1</div></div>
+    <div class="insp-row"><div class="insp-label">Floating Text Parent</div><div class="insp-value assign">⟵ già assegnato da Phase 1</div></div>
+    <div class="insp-section">Feel</div>
+    <div class="insp-row"><div class="insp-label">Punch Scale</div><div class="insp-value">1.15</div></div>
+    <div class="insp-row"><div class="insp-label">Punch Duration</div><div class="insp-value">0.08</div></div>
+    <div class="insp-section">Particelle — NUOVO</div>
+    <div class="insp-row"><div class="insp-label">Tap Particles</div><div class="insp-value assign">⟵ trascina TapParticles</div></div>
+  </div>
+</section>
+
+<!-- ── 5. HUD PRESTIGE ── -->
+<section id="hud">
+  <h2><span class="sec-num">5</span> HUD — Pulsante Prestige <span class="tag new">NUOVO</span></h2>
+
+  <p>Il pulsante Prestige deve essere <strong>inizialmente disattivo</strong> e apparire solo quando la Zona 5 (Vetta Nevosa) viene sbloccata. HUDController lo attiva automaticamente tramite evento.</p>
+
+  <h3>Step 1 — Creare il PrestigeButton nel Canvas</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Nella Hierarchy, tasto destro sul Canvas (o su un pannello UI esistente) → <strong>UI → Button - TextMeshPro</strong>. Rinominalo <code>PrestigeButton</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        <strong>Posizionamento consigliato:</strong> In alto a destra o in basso al centro. Suggeriti i valori RectTransform:
+        <br><br>
+        <div class="path">
+          <span>Anchors</span><span class="arrow">→</span>
+          <span>Top-Right (preset)</span>
+        </div>
+        <br>
+        Width: <code>200</code> / Height: <code>60</code> / Pos X: <code>-110</code> / Pos Y: <code>-90</code>
+      </div>
+    </li>
+    <li>
+      <span class="step-n">3</span>
+      <div class="step-body">
+        Seleziona il <strong>testo figlio</strong> del pulsante e imposta: <code>PRESTIGE ✨</code>, font size <code>18</code>, stile <strong>Bold</strong>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">4</span>
+      <div class="step-body">
+        Imposta un colore dorato/viola al pulsante: <strong>Image → Color</strong> → <code>#9C27B0</code> (viola prestige) oppure un gradiente personalizzato.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">5</span>
+      <div class="step-body">
+        Seleziona il componente <strong>Button</strong> → nella sezione <strong>On Click ()</strong> → clicca il <strong>+</strong> → trascina l'oggetto con <code>HUDController</code> → seleziona <code>HUDController → OnPrestigeButtonClick</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">6</span>
+      <div class="step-body">
+        <strong>IMPORTANTE:</strong> Nel pannello Inspector, disattiva il GameObject <code>PrestigeButton</code> togliendo la spunta accanto al nome. Sarà HUDController ad attivarlo al momento giusto.
+      </div>
+    </li>
+  </ol>
+
+  <h3>Step 2 — Collegare al HUDController</h3>
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Seleziona l'oggetto con il componente <code>HUDController</code>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Trova il field <strong>Prestige Button</strong> (sezione "Prestige") → trascina <code>PrestigeButton</code> dalla Hierarchy.
+      </div>
+    </li>
+  </ol>
+
+  <div class="inspector">
+    <div class="inspector-header"><span class="comp-icon">🖥️</span> HUD Controller (Script) — aggiornamento Phase 2</div>
+    <div class="insp-section">Valute — Top Bar (invariato)</div>
+    <div class="insp-row"><div class="insp-label">Acorns Text</div><div class="insp-value assign">⟵ già assegnato</div></div>
+    <div class="insp-row"><div class="insp-label">Acorns Rate Text</div><div class="insp-value assign">⟵ già assegnato</div></div>
+    <div class="insp-row"><div class="insp-label">Sparks Text</div><div class="insp-value assign">⟵ già assegnato</div></div>
+    <div class="insp-section">Zona attiva (invariato)</div>
+    <div class="insp-row"><div class="insp-label">Zone Name Text</div><div class="insp-value assign">⟵ già assegnato</div></div>
+    <div class="insp-section">Badge offline (invariato)</div>
+    <div class="insp-row"><div class="insp-label">Offline Badge</div><div class="insp-value assign">⟵ già assegnato</div></div>
+    <div class="insp-row"><div class="insp-label">Offline Badge Text</div><div class="insp-value assign">⟵ già assegnato</div></div>
+    <div class="insp-section">Prestige — NUOVO</div>
+    <div class="insp-row"><div class="insp-label">Prestige Button</div><div class="insp-value assign">⟵ trascina PrestigeButton (quello inattivo)</div></div>
+  </div>
+
+  <div class="callout info">
+    <strong>Come funziona il flusso prestige</strong>
+    Quando ZoneManager sblocca la Zona 5 → lancia <code>OnZoneUnlocked</code> → PrestigeManager ascolta l'evento e lancia <code>OnPrestigeAvailable</code> → HUDController ascolta <code>OnPrestigeAvailable</code> e chiama <code>SetActive(true)</code> sul <code>PrestigeButton</code>. Il player preme il bottone → <code>OnPrestigeButtonClick()</code> → <code>PrestigeManager.DoPrestige()</code> → save cancellato → scena ricaricata con moltiplicatore attivo.
+  </div>
+</section>
+
+<!-- ── 6. BADGE OFFLINE ── -->
+<section id="offline">
+  <h2><span class="sec-num">6</span> Badge Guadagno Offline <span class="tag mod">MODIFICATO</span></h2>
+
+  <p>Il badge offline è già presente da Phase 1, ma ora ha un'animazione pop-in/pop-out. Devi solo assicurarti che il GameObject inizi con <strong>scala zero e inattivo</strong>.</p>
+
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Nella Hierarchy, seleziona il GameObject <code>OfflineBadge</code> (quello assegnato al field <em>Offline Badge</em> in HUDController).
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Nel componente <strong>RectTransform</strong>, verifica che la scala sia <code>X:1 Y:1 Z:1</code> (lo script la gestirà da 0 in poi).
+      </div>
+    </li>
+    <li>
+      <span class="step-n">3</span>
+      <div class="step-body">
+        <strong>Disattiva il GameObject</strong> togliendo la spunta in alto nell'Inspector. Il codice chiama <code>SetActive(true)</code> all'animazione, non serve che parta attivo.
+      </div>
+    </li>
+  </ol>
+
+  <div class="callout tip">
+    <strong>L'animazione che hai adesso</strong>
+    La nuova <code>BadgeAnimation()</code> in HUDController fa:
+    scale 0→1.1 in 0.20s, poi 1.1→1.0 in 0.10s (bounce), attende 4.5s, poi 1.0→0 in 0.18s.
+    Suona anche <code>PlayOfflineBadge()</code> se l'AudioClip è assegnata.
+  </div>
+</section>
+
+<!-- ── 7. SCRIPT EXECUTION ORDER ── -->
+<section id="execorder">
+  <h2><span class="sec-num">7</span> Script Execution Order <span class="tag opt">OPZIONALE ma consigliato</span></h2>
+
+  <p>Unity garantisce che tutti gli <code>Awake()</code> vengano chiamati prima di tutti gli <code>Start()</code>. Questo significa che i singleton (PrestigeManager, ResourceManager, ZoneManager) si inizializzano correttamente prima che <code>GameBootstrap.Start()</code> chiami <code>SaveManager.Load()</code>.</p>
+
+  <p>Tuttavia, se noti comportamenti strani o NullReferenceException all'avvio, configura l'ordine esplicito:</p>
+
+  <ol class="steps">
+    <li>
+      <span class="step-n">1</span>
+      <div class="step-body">
+        Menu <strong>Edit → Project Settings → Script Execution Order</strong>.
+      </div>
+    </li>
+    <li>
+      <span class="step-n">2</span>
+      <div class="step-body">
+        Clicca il <strong>+</strong> in basso e aggiungi ogni script con il valore indicato:
+      </div>
+    </li>
+  </ol>
+
+  <table>
+    <tr><th>Script</th><th>Order</th><th>Perché</th></tr>
+    <tr><td><code>PrestigeManager</code></td><td><strong>-300</strong></td><td>Deve caricare il moltiplicatore PRIMA che i Producer si registrino</td></tr>
+    <tr><td><code>ResourceManager</code></td><td><strong>-200</strong></td><td>Singleton risorse, usato da tutti</td></tr>
+    <tr><td><code>ZoneManager</code></td><td><strong>-150</strong></td><td>Usato da Producer e HUD</td></tr>
+    <tr><td><code>SaveManager</code></td><td><strong>-100</strong></td><td>Deve trovare tutti gli altri singleton già pronti</td></tr>
+    <tr><td><code>AudioManager</code></td><td><strong>-250</strong></td><td>Disponibile prima di Producer e Tapper</td></tr>
+    <tr><td><code>ScreenShake</code></td><td><strong>-50</strong></td><td>Può inizializzarsi dopo, la Camera è già stabile</td></tr>
+    <tr><td><code>GameBootstrap</code></td><td><strong>100</strong></td><td>Deve girare PER ULTIMO — chiama Load()</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <strong>Se non configuri lo Script Execution Order</strong>
+    Nella maggior parte dei casi funzionerà comunque grazie alle null-check e all'uso di <code>?.PrestigeMultiplier ?? 1.0</code> già nei script. Configura questo solo se vedi errori NullReference al primo avvio.
+  </div>
+</section>
+
+<!-- ── 8. CHECKLIST ── -->
+<section id="checklist">
+  <h2><span class="sec-num">8</span> Checklist Finale</h2>
+
+  <p>Usa questa lista per verificare di non aver dimenticato nulla prima di fare Play.</p>
+
+  <h3>Hierarchy &amp; Componenti</h3>
+  <ul class="checklist">
+    <li><code>PrestigeManager</code> aggiunto al GameManager</li>
+    <li><code>AudioManager</code> aggiunto al GameManager</li>
+    <li><code>ScreenShake</code> aggiunto al GameManager</li>
+    <li>GameObject figlio <code>MusicSource</code> con AudioSource configurato (Loop=true, PlayOnAwake=false)</li>
+    <li>GameObject figlio <code>SFXSource</code> con AudioSource configurato (Loop=false, PlayOnAwake=false)</li>
+    <li>AudioManager Inspector: Music Source → MusicSource / SFX Source → SFXSource</li>
+    <li>GameObject <code>TapParticles</code> creato in scena (fuori dal Canvas)</li>
+    <li>TapParticles configurato: Looping=false, PlayOnAwake=false, Burst 15 particelle</li>
+    <li>Tapper Inspector: field "Tap Particles" → TapParticles</li>
+    <li>GameObject <code>PrestigeButton</code> creato nel Canvas</li>
+    <li>PrestigeButton OnClick → HUDController.OnPrestigeButtonClick()</li>
+    <li>PrestigeButton inizialmente <strong>disattivo</strong> (spunta rimossa nell'Inspector)</li>
+    <li>HUDController Inspector: field "Prestige Button" → PrestigeButton</li>
+    <li><code>OfflineBadge</code> inizialmente <strong>disattivo</strong></li>
+  </ul>
+
+  <h3>Audio (da completare quando hai i file)</h3>
+  <ul class="checklist">
+    <li>AudioManager Inspector: Ambient Music → file .ogg/.wav ambient forest</li>
+    <li>AudioManager Inspector: Tap Clip → suono secco breve (pop o clic)</li>
+    <li>AudioManager Inspector: Upgrade Clip → suono positivo (chime, ding)</li>
+    <li>AudioManager Inspector: Zone Unlock Clip → fanfara breve (jingle)</li>
+    <li>AudioManager Inspector: Offline Badge Clip → notifica piacevole</li>
+    <li>AudioManager Inspector: Prestige Clip → suono epico/magico</li>
+  </ul>
+
+  <h3>Script Execution Order (opzionale)</h3>
+  <ul class="checklist">
+    <li>PrestigeManager: -300</li>
+    <li>AudioManager: -250</li>
+    <li>ResourceManager: -200</li>
+    <li>ZoneManager: -150</li>
+    <li>SaveManager: -100</li>
+    <li>GameBootstrap: +100</li>
+  </ul>
+</section>
+
+<!-- ── 9. TESTING ── -->
+<section id="testing">
+  <h2><span class="sec-num">9</span> Testing &amp; Debug</h2>
+
+  <h3>Come testare ogni feature di Phase 2</h3>
+
+  <table>
+    <tr><th>Feature</th><th>Come testare</th><th>Risultato atteso</th></tr>
+    <tr>
+      <td>🔊 AudioManager</td>
+      <td>Premi Play, tocca il tap button</td>
+      <td>Senti il suono tap (se hai il clip) o nessun errore nella Console</td>
+    </tr>
+    <tr>
+      <td>✨ Tap Particles</td>
+      <td>Premi Play, clicca il tap button</td>
+      <td>Burst di 15 particelle che esplodono e svaniscono</td>
+    </tr>
+    <tr>
+      <td>📷 ScreenShake Small</td>
+      <td>Fai l'upgrade di una stanza già acquistata</td>
+      <td>Camera trema leggermente per 0.15s</td>
+    </tr>
+    <tr>
+      <td>📷 ScreenShake Medium</td>
+      <td>Acquista una stanza per la prima volta (Lv 0→1)</td>
+      <td>Camera trema più marcata per 0.28s</td>
+    </tr>
+    <tr>
+      <td>📷 ScreenShake Big</td>
+      <td>Accumula 500 ghiande → sblocca Zona 2</td>
+      <td>Camera shake deciso per 0.45s + jingle</td>
+    </tr>
+    <tr>
+      <td>🏷️ Badge Offline</td>
+      <td>In Play Mode, apri Project Settings → Time → Time Scale = 0. Poi modifica manualmente <code>lastSaveTime</code> nel save, o usa il metodo di debug qui sotto</td>
+      <td>Badge appare con animazione pop-in, svanisce dopo ~5s</td>
+    </tr>
+    <tr>
+      <td>⭐ Prestige Button</td>
+      <td>Usa il trucco cheat (vedi sotto) per sbloccare la Zona 5</td>
+      <td>Il PrestigeButton diventa visibile con animazione</td>
+    </tr>
+    <tr>
+      <td>⭐ Prestige Reset</td>
+      <td>Con Zona 5 sbloccata, premi PrestigeButton</td>
+      <td>Scena si ricarica, ghiande azzerati, produzione × 1.5</td>
+    </tr>
+  </table>
+
+  <h3>Cheat rapido per testare senza giocare ore</h3>
+  <p>Aggiungi temporaneamente questo metodo a <code>GameBootstrap.cs</code> (e rimuovilo dopo il test):</p>
+
+  <pre><span class="comment">// SOLO PER TEST — rimuovi prima del build</span>
+<span class="key">private void</span> <span class="val">Update</span>()
+{
+    <span class="comment">// Premi C in editor per avere 100.000 ghiande</span>
+    <span class="key">if</span> (Input.GetKeyDown(KeyCode.C))
+        ResourceManager.Instance.AddAcorns(<span class="val">100_000</span>);
+
+    <span class="comment">// Premi O per simulare 2 ore offline</span>
+    <span class="key">if</span> (Input.GetKeyDown(KeyCode.O))
+        HUDController.Instance?.ShowOfflineBadge(<span class="val">1234.5</span>);
+}</pre>
+
+  <h3>Testare il Prestige Multiplier</h3>
+  <p>Dopo il prestige, la produzione deve essere × 1.5. Verifica nella Console:</p>
+  <pre><span class="comment">// Aggiungi in PrestigeManager.DoPrestige() temporaneamente:</span>
+Debug.Log(<span class="str">$"PRESTIGE OK — Rate atteso: {ResourceManager.Instance.TotalProductionPerSecond * 1.5}"</span>);
+  </pre>
+
+  <div class="callout danger">
+    <strong>Errore comune — NullReferenceException su PrestigeManager</strong>
+    Se vedi <code>NullReferenceException: PrestigeManager.Instance</code> all'avvio, significa che il componente non è presente nella scena. Controlla di aver aggiunto PrestigeManager al GameManager nella Hierarchy.
+  </div>
+
+  <div class="callout danger">
+    <strong>Errore comune — Shake non funziona</strong>
+    Se la camera non si muove, verifica: (1) ScreenShake è nel GameManager, (2) la Main Camera è taggata come <code>MainCamera</code> in Unity (Tag → MainCamera nel dropdown in cima all'Inspector della camera), (3) controlla la Console per <code>[ScreenShake] targetCamera == null</code>.
+  </div>
+
+  <div class="callout tip">
+    <strong>Ordine consigliato di setup</strong>
+    PrestigeManager → AudioManager (con AudioSources) → ScreenShake → TapParticles → PrestigeButton → Offline Badge → Script Execution Order → Test. Segui l'ordine delle sezioni e spunta la checklist man mano.
+  </div>
+
+  <hr>
+
+  <div style="text-align:center; padding: 24px 0; color: var(--muted); font-size: 0.9rem;">
+    🌰 Woodland Burrow — Phase 2 Guide · Generata per Unity 2022 LTS 2D URP
+    <br>
+    <span style="color: var(--gold); margin-top: 6px; display:block;">Buon sviluppo, Spike conta su di te! 🦔</span>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+  // Highlight nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 140) cur = s.id; });
+    links.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+    });
+  });
+</script>
+</body>
+</html>

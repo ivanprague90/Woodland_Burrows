@@ -19,14 +19,19 @@ namespace WoodlandBurrow
         private double _sparks;        // ✨ valuta premium
         private double _mushrooms;     // 🍄 craft currency
 
-        // --- Produzione totale (calcolata da tutti i Producer attivi) ---
+        // --- Produzione totale idle (acorns/s, per HUD e guadagno offline) ---
         public double TotalProductionPerSecond { get; private set; }
+
+        // --- Moltiplicatore tap globale (prodotto di tutti i TapMultiplier producer) ---
+        private double _tapMultiplier = 1.0;
+        public  double TapMultiplier => _tapMultiplier;
 
         // --- Eventi per la UI ---
         public event Action<double> OnAcornsChanged;
         public event Action<double> OnSparksChanged;
         public event Action<double> OnMushroomsChanged;
         public event Action<double> OnProductionChanged;
+        public event Action<double> OnTapMultiplierChanged;
 
         // --- Proprietà pubbliche (sola lettura) ---
         public double Acorns    => _acorns;
@@ -42,11 +47,6 @@ namespace WoodlandBurrow
             DontDestroyOnLoad(gameObject);
         }
 
-        private void Start()
-        {
-            SaveManager.Instance?.Load();
-        }
-
         // --------------------------------------------------------
         //  Aggiunta valute
         // --------------------------------------------------------
@@ -55,6 +55,7 @@ namespace WoodlandBurrow
         {
             _acorns += amount;
             OnAcornsChanged?.Invoke(_acorns);
+            ZoneManager.Instance?.CheckZoneUnlocks();
         }
 
         public void AddSparks(double amount)
@@ -92,7 +93,7 @@ namespace WoodlandBurrow
         public bool CanAfford(double acornCost) => _acorns >= acornCost;
 
         // --------------------------------------------------------
-        //  Produzione idle — chiamato dai Producer ogni frame
+        //  Produzione idle — chiamato dai Producer (solo IdleProduction acorns)
         // --------------------------------------------------------
 
         public void RegisterProduction(double acornsPerSecond)
@@ -105,6 +106,20 @@ namespace WoodlandBurrow
         {
             TotalProductionPerSecond = Math.Max(0, TotalProductionPerSecond - acornsPerSecond);
             OnProductionChanged?.Invoke(TotalProductionPerSecond);
+        }
+
+        // --------------------------------------------------------
+        //  Moltiplicatore tap — gestito dai TapMultiplier producer
+        //  oldContrib: contributo precedente del producer (1.0 se è il primo)
+        //  newContrib: nuovo contributo dopo l'upgrade
+        // --------------------------------------------------------
+
+        public void UpdateTapContribution(double oldContrib, double newContrib)
+        {
+            if (oldContrib > 0) _tapMultiplier = _tapMultiplier / oldContrib * newContrib;
+            else                _tapMultiplier *= newContrib;
+            _tapMultiplier = Math.Max(1.0, _tapMultiplier);
+            OnTapMultiplierChanged?.Invoke(_tapMultiplier);
         }
 
         // --------------------------------------------------------

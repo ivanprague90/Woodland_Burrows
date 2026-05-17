@@ -10,6 +10,13 @@ using UnityEngine;
 
 namespace WoodlandBurrow
 {
+    public enum ProducerType
+    {
+        IdleProduction,   // Aggiunge valuta ogni secondo (Dispensa, Giardino, ecc.)
+        TapMultiplier,    // Moltiplica le ghiande per tap (Cuccia Morbida)
+        OfflineMultiplier // Bonus guadagno offline (Sala Lucciole — futuro)
+    }
+
     [CreateAssetMenu(
         menuName = "WoodlandBurrow/Producer",
         fileName = "Producer_Dispensa")]
@@ -19,6 +26,10 @@ namespace WoodlandBurrow
         public string producerName = "Dispensa";
         public string description  = "Raccoglie ghiande automaticamente.";
         public Sprite icon;
+
+        [Header("Tipo")]
+        [Tooltip("Definisce il comportamento meccanico di questa stanza")]
+        public ProducerType producerType = ProducerType.IdleProduction;
 
         [Header("Zona")]
         [Tooltip("0 = Tana, 1 = Prato, 2 = Ruscello, …")]

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bb163ad57e1fb14eb269567d208a082, type: 3}
+  m_Name: Zone_00_Tana
+  m_EditorClassIdentifier: Assembly-CSharp::WoodlandBurrow.ZoneData
+  zoneName: La Tana di Spike
+  description: Il punto di partenza di Spike nel Bosco Antico.
+  background: {fileID: 0}
+  icon: {fileID: 0}
+  accentColor: {r: 0, g: 1, b: 0, a: 1}
+  zoneIndex: 0
+  overrideUnlockCost: 0
+  producers:
+  - {fileID: 11400000, guid: 491979d4528fc13449d2eff4683a9094, type: 2}
+  - {fileID: 11400000, guid: df5066ad32b6a084cbff629ce4672425, type: 2}
+  - {fileID: 11400000, guid: 9b8492349ce9e804f993758585bdbf2d, type: 2}
+  - {fileID: 11400000, guid: bfa06355dc8b2c843917746b3164d40b, type: 2}
+  guestAnimals: []
+  specialMechanic: 0

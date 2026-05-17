@@ -20,11 +20,11 @@ namespace WoodlandBurrow
         [SerializeField] private RectTransform floatingTextParent;
 
         [Header("Feel")]
-        [SerializeField] private float punchScale  = 1.15f;
+        [SerializeField] private float punchScale    = 1.15f;
         [SerializeField] private float punchDuration = 0.08f;
 
-        // Moltiplicatori aggiuntivi (applicati dagli upgrade)
-        private double _tapMultiplier = 1.0;
+        [Header("Particelle")]
+        [SerializeField] private ParticleSystem tapParticles;
 
         private Vector3 _baseScale;
 
@@ -40,13 +40,16 @@ namespace WoodlandBurrow
 
         public void OnTap()
         {
-            double earned = GameConstants.AcornsPerTap * _tapMultiplier;
+            double tapMult      = ResourceManager.Instance.TapMultiplier;
+            double prestigeMult = PrestigeManager.Instance?.PrestigeMultiplier ?? 1.0;
+            double earned       = GameConstants.AcornsPerTap * tapMult * prestigeMult;
             ResourceManager.Instance.AddAcorns(earned);
 
             SpawnFloatingText(earned);
             StartCoroutine(PunchAnimation());
 
-            // Qui si possono aggiungere: particle burst, haptic feedback, SFX
+            tapParticles?.Play();
+            AudioManager.Instance?.PlayTap();
         }
 
         // --------------------------------------------------------
@@ -59,7 +62,7 @@ namespace WoodlandBurrow
 
             var ft = Instantiate(floatingTextPrefab, floatingTextParent);
             var startPos = new Vector2(Random.Range(-40f, 40f), Random.Range(0f, 30f));
-            ft.Play($"+{FormatNumber(amount)} 🌰", startPos);
+            ft.Play($"+{FormatNumber(amount)} G", startPos);
         }
 
         // --------------------------------------------------------
@@ -71,16 +74,6 @@ namespace WoodlandBurrow
             tapButton.transform.localScale = _baseScale * punchScale;
             yield return new WaitForSeconds(punchDuration);
             tapButton.transform.localScale = _baseScale;
-        }
-
-        // --------------------------------------------------------
-        //  API pubblica per upgrade
-        // --------------------------------------------------------
-
-        /// <summary>Applica un moltiplicatore al tap (es. ×2 dalla Cuccia Morbida)</summary>
-        public void ApplyTapMultiplier(double multiplier)
-        {
-            _tapMultiplier *= multiplier;
         }
 
         // --------------------------------------------------------

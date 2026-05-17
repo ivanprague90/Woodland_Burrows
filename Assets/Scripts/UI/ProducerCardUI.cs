@@ -67,13 +67,27 @@ namespace WoodlandBurrow.UI
             if (rateText != null)
             {
                 rateText.color = active ? activeRateColor : inactiveRateColor;
-                rateText.text  = active
-                    ? $"{FormatNumber(data.ProductionAtLevel(level - 1))}/s"
-                    : "—";
+                if (!active)
+                {
+                    rateText.text = "—";
+                }
+                else if (data.producerType == ProducerType.TapMultiplier)
+                {
+                    rateText.text = $"×{FormatNumber(data.ProductionAtLevel(level - 1))} tap";
+                }
+                else if (data.producesSecondaryCurrency)
+                {
+                    string sym = data.secondaryCurrency == SecondaryCurrency.Mushrooms ? "🍄" : "✨";
+                    rateText.text = $"{FormatNumber(data.ProductionAtLevel(level - 1))}{sym}/s";
+                }
+                else
+                {
+                    rateText.text = $"{FormatNumber(data.ProductionAtLevel(level - 1))}/s";
+                }
             }
 
             if (costText != null)
-                costText.text = $"🌰 {FormatNumber(data.CostAtLevel(level))}";
+                costText.text = $"{FormatNumber(data.CostAtLevel(level))} G";
 
             if (lockedOverlay != null) lockedOverlay.SetActive(locked);
             if (upgradeButton != null) upgradeButton.interactable = !locked;

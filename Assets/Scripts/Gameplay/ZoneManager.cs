@@ -50,11 +50,12 @@ namespace WoodlandBurrow
                 if (!PreviousZoneUnlocked(zone.zoneIndex))   continue;
                 if (!ResourceManager.Instance.CanAfford(zone.UnlockCost)) continue;
 
-                // Tutto soddisfatto: sblocca la zona
                 if (ResourceManager.Instance.SpendAcorns(zone.UnlockCost))
                 {
                     _unlockedZones.Add(zone.zoneIndex);
                     OnZoneUnlocked?.Invoke(zone);
+                    AudioManager.Instance?.PlayZoneUnlock();
+                    WoodlandBurrow.UI.ScreenShake.Instance?.Shake(WoodlandBurrow.UI.ScreenShake.Intensity.Big);
                     Debug.Log($"[ZoneManager] Zona sbloccata: {zone.zoneName}");
                 }
             }

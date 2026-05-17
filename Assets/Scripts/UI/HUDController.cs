@@ -5,6 +5,7 @@
 //  ResourceManager senza polling ogni frame.
 // ============================================================
 
+using System.Collections;
 using UnityEngine;
 using TMPro;
 
@@ -24,7 +25,12 @@ namespace WoodlandBurrow.UI
         [SerializeField] private GameObject      offlineBadge;
         [SerializeField] private TextMeshProUGUI offlineBadgeText;
 
+        [Header("Prestige")]
+        [SerializeField] private GameObject prestigeButton;
+
         public static HUDController Instance { get; private set; }
+
+        private Coroutine _badgeRoutine;
 
         // --------------------------------------------------------
 
@@ -35,10 +41,16 @@ namespace WoodlandBurrow.UI
 
         private void OnEnable()
         {
-            ResourceManager.Instance.OnAcornsChanged    += UpdateAcorns;
-            ResourceManager.Instance.OnSparksChanged    += UpdateSparks;
-            ResourceManager.Instance.OnProductionChanged += UpdateRate;
-            ZoneManager.Instance.OnActiveZoneChanged    += UpdateZoneName;
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.OnAcornsChanged    += UpdateAcorns;
+                ResourceManager.Instance.OnSparksChanged    += UpdateSparks;
+                ResourceManager.Instance.OnProductionChanged += UpdateRate;
+            }
+            if (ZoneManager.Instance != null)
+                ZoneManager.Instance.OnActiveZoneChanged += UpdateZoneName;
+            if (PrestigeManager.Instance != null)
+                PrestigeManager.Instance.OnPrestigeAvailable += ShowPrestigeButton;
         }
 
         private void OnDisable()
@@ -47,16 +59,41 @@ namespace WoodlandBurrow.UI
             ResourceManager.Instance.OnAcornsChanged    -= UpdateAcorns;
             ResourceManager.Instance.OnSparksChanged    -= UpdateSparks;
             ResourceManager.Instance.OnProductionChanged -= UpdateRate;
-            ZoneManager.Instance.OnActiveZoneChanged    -= UpdateZoneName;
+            if (ZoneManager.Instance != null)
+                ZoneManager.Instance.OnActiveZoneChanged -= UpdateZoneName;
+            if (PrestigeManager.Instance != null)
+                PrestigeManager.Instance.OnPrestigeAvailable -= ShowPrestigeButton;
         }
 
         private void Start()
         {
-            // Inizializzazione con i valori correnti
-            UpdateAcorns(ResourceManager.Instance.Acorns);
-            UpdateSparks(ResourceManager.Instance.Sparks);
-            UpdateRate(ResourceManager.Instance.TotalProductionPerSecond);
-            UpdateZoneName(ZoneManager.Instance.GetActiveZone());
+            if (ResourceManager.Instance != null)
+            {
+                ResourceManager.Instance.OnAcornsChanged    -= UpdateAcorns;
+                ResourceManager.Instance.OnSparksChanged    -= UpdateSparks;
+                ResourceManager.Instance.OnProductionChanged -= UpdateRate;
+                ResourceManager.Instance.OnAcornsChanged    += UpdateAcorns;
+                ResourceManager.Instance.OnSparksChanged    += UpdateSparks;
+                ResourceManager.Instance.OnProductionChanged += UpdateRate;
+
+                UpdateAcorns(ResourceManager.Instance.Acorns);
+                UpdateSparks(ResourceManager.Instance.Sparks);
+                UpdateRate(ResourceManager.Instance.TotalProductionPerSecond);
+            }
+            if (ZoneManager.Instance != null)
+            {
+                ZoneManager.Instance.OnActiveZoneChanged -= UpdateZoneName;
+                ZoneManager.Instance.OnActiveZoneChanged += UpdateZoneName;
+                UpdateZoneName(ZoneManager.Instance.GetActiveZone());
+            }
+            if (PrestigeManager.Instance != null)
+            {
+                PrestigeManager.Instance.OnPrestigeAvailable -= ShowPrestigeButton;
+                PrestigeManager.Instance.OnPrestigeAvailable += ShowPrestigeButton;
+            }
+
+            if (offlineBadge != null) offlineBadge.SetActive(false);
+            if (prestigeButton != null) prestigeButton.SetActive(PrestigeManager.Instance?.CanPrestige ?? false);
         }
 
         // --------------------------------------------------------
@@ -88,23 +125,63 @@ namespace WoodlandBurrow.UI
         }
 
         // --------------------------------------------------------
-        //  Badge guadagno offline
+        //  Badge guadagno offline — animato (pop-in / pop-out)
         // --------------------------------------------------------
 
         public void ShowOfflineBadge(double acornsEarned)
         {
             if (offlineBadge == null) return;
-            offlineBadge.SetActive(true);
             if (offlineBadgeText != null)
-                offlineBadgeText.text = $"+{FormatNumber(acornsEarned)} 🌰 offline!";
+                offlineBadgeText.text = $"+{FormatNumber(acornsEarned)} G offline!";
 
-            // Auto-dismiss dopo 5 secondi
-            Invoke(nameof(HideOfflineBadge), 5f);
+            if (_badgeRoutine != null) StopCoroutine(_badgeRoutine);
+            _badgeRoutine = StartCoroutine(BadgeAnimation());
+
+            AudioManager.Instance?.PlayOfflineBadge();
         }
 
-        private void HideOfflineBadge()
+        private IEnumerator BadgeAnimation()
         {
-            if (offlineBadge != null) offlineBadge.SetActive(false);
+            offlineBadge.SetActive(true);
+            var rt = offlineBadge.GetComponent<RectTransform>();
+
+            // Pop-in: scale 0 → 1.1 → 1.0
+            yield return ScaleTo(rt, Vector3.zero,         Vector3.one * 1.1f, 0.20f);
+            yield return ScaleTo(rt, Vector3.one * 1.1f,  Vector3.one,        0.10f);
+
+            yield return new WaitForSeconds(4.5f);
+
+            // Pop-out: scale 1.0 → 0
+            yield return ScaleTo(rt, Vector3.one, Vector3.zero, 0.18f);
+
+            offlineBadge.SetActive(false);
+        }
+
+        private static IEnumerator ScaleTo(RectTransform rt, Vector3 from, Vector3 to, float dur)
+        {
+            if (rt == null) { yield return new WaitForSeconds(dur); yield break; }
+            float e = 0f;
+            while (e < dur)
+            {
+                e += Time.deltaTime;
+                rt.localScale = Vector3.Lerp(from, to, e / dur);
+                yield return null;
+            }
+            rt.localScale = to;
+        }
+
+        // --------------------------------------------------------
+        //  Prestige button
+        // --------------------------------------------------------
+
+        private void ShowPrestigeButton()
+        {
+            if (prestigeButton != null) prestigeButton.SetActive(true);
+        }
+
+        public void OnPrestigeButtonClick()
+        {
+            PrestigeManager.Instance?.DoPrestige();
         }
 
         // --------------------------------------------------------

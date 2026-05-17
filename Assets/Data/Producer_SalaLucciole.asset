@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd73e96268664ab4ba321518d436a5fe, type: 3}
+  m_Name: Producer_SalaLucciole
+  m_EditorClassIdentifier: Assembly-CSharp::WoodlandBurrow.ProducerData
+  producerName: Sala Lucciole
+  description: Raddoppia il guadagno offline.
+  icon: {fileID: 0}
+  zoneIndex: 1
+  baseProductionPerSecond: 0
+  baseCost: 2000
+  productionMultiplier: 1.8
+  costExponent: 1.6
+  producesSecondaryCurrency: 0
+  secondaryCurrency: 0
